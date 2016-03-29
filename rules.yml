@@ -1,7 +1,0 @@
-gotUpTo: "2016-03-28T06:05:26.436Z" #Air Max BW OG",  id: 523180
-rootUrlStart: "https://www.grailed.com/api/listings/grailed?filters%5Bcategories%5D=all&filters%5Bdesigners%5D=all&filters%5Blocations%5D=all&light=true&order=desc&page="
-rootUrlEnd: "&sort=created_at&strata=grailed"
-goodPatterns:
-  - "Supreme|supreme"
-goodDesigners:
-  - "Supreme"
