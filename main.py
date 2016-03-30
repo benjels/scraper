@@ -59,15 +59,8 @@ class Scraper(object):
 			#TODO: WILL WANT TO HAVE AN "ENTRY" OBJECT DEFINED IN YAML SO THAT WE CAN STIPULATE E.G. MUST BE BY ONE OF THESE DESIGNERS REGEX, MUST HAVE THESE REGEXES IN THE TITLE OR DESC, MUST NOT HAVE THESE REGEXES, MUST HAVE ONE OF THESE REGEXES. 
 			#so it has to pass all of those aforementioned stages before it would be added to the found list. If e.g. it can be any designer. Then i just put a wildcard regex in that category
 	def decideIfRelevant(self, listing):
-		#check the title and description for our patterns
-		for eachRegex in self.rules["searchRules"]["goodPatterns"]:
-			if(regex.search(eachRegex, listing["description"])):
-				return True
-			if(regex.search(eachRegex, listing["title"])):
-				return True
-		#check the designer
-		for eachRegex in self.rules["searchRules"]["goodDesigners"]:
-			if(regex.search(eachRegex, listing["designer"]["name"])):
+		for eachRule in self.rules["searchRules"]:
+			if any(regex.search(eachDesignerRegex, listing["designer"]["name"]) for eachDesignerRegex in eachRule["allowedDesigners"]) and all(regex.search(eachAndRegex, listing["title"] + listing["description"]) for eachAndRegex in eachRule["andTerms"]) and any(regex.search(eachOrRegex, listing["title"] + listing["description"]) for eachOrRegex in eachRule["orTerms"]):
 				return True
 		return False
 
@@ -117,8 +110,10 @@ class Scraper(object):
 		#clean the newline chars from the file AND collect any blacklist items
 		for eachIndex in range(len(linesFromFile)):
 			linesFromFile[eachIndex] = linesFromFile[eachIndex].replace("\n", "")
-			if "wackting" in linesFromFile[eachIndex]:
+			if "wackting" in linesFromFile[eachIndex]: #TODO this is kind of a gross hack where i just add the string and the string with wackting in standard place removed to a list of strings that shouldn't be written. actually it's ok because it's not going to be expensive as it only has to keep enough to stop things from 1st page getting rewritten when we dont actually want them (old things that get wacktinged will just be dropped from the file once and then never put back in). But you should generalise the " wackting" thing a lil maybe
+				self.blacklist.append(linesFromFile[eachIndex].replace(" wackting", ""))
 				self.blacklist.append(linesFromFile[eachIndex])
+				print("adding this to the blacklist: |" + linesFromFile[eachIndex].replace("wackting", "") + "|")
 		
 		#finally, combine the two groups of lines and write all of the lines back to the file
 		linesToWrite = []
@@ -134,6 +129,7 @@ class Scraper(object):
 				#linesFromFile.remove(eachIndex)
 				if eachLine not in self.blacklist:
 					fileStream.write(eachLine + "\n")
+
 
 
 
