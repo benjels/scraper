@@ -111,7 +111,7 @@ class Scraper(object):
 		for eachIndex in range(len(linesFromFile)):
 			linesFromFile[eachIndex] = linesFromFile[eachIndex].replace("\n", "")
 			if "wackting" in linesFromFile[eachIndex]: #TODO this is kind of a gross hack where i just add the string and the string with wackting in standard place removed to a list of strings that shouldn't be written. actually it's ok because it's not going to be expensive as it only has to keep enough to stop things from 1st page getting rewritten when we dont actually want them (old things that get wacktinged will just be dropped from the file once and then never put back in). But you should generalise the " wackting" thing a lil maybe
-				self.blacklist.append(linesFromFile[eachIndex].replace(" wackting", ""))
+				self.blacklist.append(linesFromFile[eachIndex].replace(" idontwant", ""))
 				self.blacklist.append(linesFromFile[eachIndex])
 				print("adding this to the blacklist: |" + linesFromFile[eachIndex].replace("wackting", "") + "|")
 		
