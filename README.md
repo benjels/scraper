@@ -13,6 +13,6 @@ You can change the things that you are looking for by editing the settings.json 
 Any matches that are found are logged in the log.txt text file. It includes the pretty URL of the grailed listing. If you want to remove an item from log.txt (and you don't want it to be picked up by the scraper again), add " idontwant" to the end of that line and then save the file.
 
 I plan to extend the search options so that you can stipulate price ranges, etc. Also the alert tone is pretty annoying.
-
-:)))))
 This is the hotfix
+This is also a major key
+8)))))
