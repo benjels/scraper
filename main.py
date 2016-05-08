@@ -44,12 +44,13 @@ class Scraper(object):
 				assert(oldDate >= sanitisedDate)
 				oldDate = sanitisedDate# this is for debug###
 				if(self.sanitiseDate(self.rules["info"]["gotUpTo"]) > sanitisedDate):
-					print("WE GOT UP TO WHERE WE WATCHED TIL LAST TIME, SO ENDING THE CATCHUP PHASE")
-					#print(sanitisedDate)
 					self.logCurrentFoundItems()
 					return
 				if(self.decideIfRelevant(eachListing)):
-					print("while catching up, we found: " + eachListing["title"])
+					try:
+						print("while catching up, we found: " + eachListing["title"])
+					except UnicodeEncodeError:
+						print("while catching up we found an items that causes unicode encode error")
 					self.playAlert()
 					self.foundListings[eachListing["title"]] = eachListing
 			pageNumber += 1
@@ -78,7 +79,7 @@ class Scraper(object):
 		#update the part of the rules file that keeps track of what time we are up to. 
 		nowUpTo = pageJSON["data"][0]["created_at"]
 		self.rules["info"]["gotUpTo"] = nowUpTo;
-		with open("settings.json", "w") as fileStream:
+		with open("settings.json", "w", encoding="utf-8") as fileStream:
 			json.dump(self.rules, fileStream)
 		time.sleep(interval)
 		self.watch(interval)
@@ -105,7 +106,7 @@ class Scraper(object):
 
 		#now we want to get the old lines that are already in the file and append them
 		linesFromFile = []
-		with open("log.txt", "r") as fileStream:
+		with open("log.txt", "r", encoding="utf-8") as fileStream:
 			linesFromFile = fileStream.readlines()
 		#clean the newline chars from the file AND collect any blacklist items
 		for eachIndex in range(len(linesFromFile)):
@@ -122,13 +123,16 @@ class Scraper(object):
 		for each in linesFromFile:
 			if(each not in linesToWrite):
 				linesToWrite.append(each)
-		with open("log.txt", "w") as fileStream:
+		with open("log.txt", "w", encoding="utf-8") as fileStream:
 			for eachLine in linesToWrite:
 				#only write it to the file if it's not on the blacklist
 				#if not any(x in linesFromFile[eachIndex] for x in self.blacklist):
 				#linesFromFile.remove(eachIndex)
 				if eachLine not in self.blacklist:
-					fileStream.write(eachLine + "\n")
+					try:
+						fileStream.write(eachLine + "\n")
+					except:
+						print("problem writing an item to file")
 
 
 
