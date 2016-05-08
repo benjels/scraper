@@ -44,13 +44,12 @@ class Scraper(object):
 				assert(oldDate >= sanitisedDate)
 				oldDate = sanitisedDate# this is for debug###
 				if(self.sanitiseDate(self.rules["info"]["gotUpTo"]) > sanitisedDate):
+					print("WE GOT UP TO WHERE WE WATCHED TIL LAST TIME, SO ENDING THE CATCHUP PHASE")
+					#print(sanitisedDate)
 					self.logCurrentFoundItems()
 					return
 				if(self.decideIfRelevant(eachListing)):
-					try:
-						print("while catching up, we found: " + eachListing["title"])
-					except UnicodeEncodeError:
-						print("while catching up we found an items that causes unicode encode error")
+					print("while catching up, we found: " + eachListing["title"])
 					self.playAlert()
 					self.foundListings[eachListing["title"]] = eachListing
 			pageNumber += 1
@@ -79,7 +78,7 @@ class Scraper(object):
 		#update the part of the rules file that keeps track of what time we are up to. 
 		nowUpTo = pageJSON["data"][0]["created_at"]
 		self.rules["info"]["gotUpTo"] = nowUpTo;
-		with open("settings.json", "w", encoding="utf-8") as fileStream:
+		with open("settings.json", "w") as fileStream:
 			json.dump(self.rules, fileStream)
 		time.sleep(interval)
 		self.watch(interval)
@@ -106,15 +105,15 @@ class Scraper(object):
 
 		#now we want to get the old lines that are already in the file and append them
 		linesFromFile = []
-		with open("log.txt", "r", encoding="utf-8") as fileStream:
+		with open("log.txt", "r") as fileStream:
 			linesFromFile = fileStream.readlines()
 		#clean the newline chars from the file AND collect any blacklist items
 		for eachIndex in range(len(linesFromFile)):
 			linesFromFile[eachIndex] = linesFromFile[eachIndex].replace("\n", "")
-			if "idontwant" in linesFromFile[eachIndex]: #TODO this is kind of a gross hack where i just add the string and the string with wackting in standard place removed to a list of strings that shouldn't be written. actually it's ok because it's not going to be expensive as it only has to keep enough to stop things from 1st page getting rewritten when we dont actually want them (old things that get wacktinged will just be dropped from the file once and then never put back in). But you should generalise the " wackting" thing a lil maybe
-				self.blacklist.append(linesFromFile[eachIndex].replace(" idontwant", ""))
+			if "wackting" in linesFromFile[eachIndex]: #TODO this is kind of a gross hack where i just add the string and the string with wackting in standard place removed to a list of strings that shouldn't be written. actually it's ok because it's not going to be expensive as it only has to keep enough to stop things from 1st page getting rewritten when we dont actually want them (old things that get wacktinged will just be dropped from the file once and then never put back in). But you should generalise the " wackting" thing a lil maybe
+				self.blacklist.append(linesFromFile[eachIndex].replace(" wackting", ""))
 				self.blacklist.append(linesFromFile[eachIndex])
-				print("adding this to the blacklist: |" + linesFromFile[eachIndex].replace("idontwant", "") + "|")
+				print("adding this to the blacklist: |" + linesFromFile[eachIndex].replace("wackting", "") + "|")
 		
 		#finally, combine the two groups of lines and write all of the lines back to the file
 		linesToWrite = []
@@ -123,16 +122,13 @@ class Scraper(object):
 		for each in linesFromFile:
 			if(each not in linesToWrite):
 				linesToWrite.append(each)
-		with open("log.txt", "w", encoding="utf-8") as fileStream:
+		with open("log.txt", "w") as fileStream:
 			for eachLine in linesToWrite:
 				#only write it to the file if it's not on the blacklist
 				#if not any(x in linesFromFile[eachIndex] for x in self.blacklist):
 				#linesFromFile.remove(eachIndex)
 				if eachLine not in self.blacklist:
-					try:
-						fileStream.write(eachLine + "\n")
-					except:
-						print("problem writing an item to file")
+					fileStream.write(eachLine + "\n")
 
 
 
