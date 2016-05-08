@@ -15,3 +15,4 @@ Any matches that are found are logged in the log.txt text file. It includes the 
 I plan to extend the search options so that you can stipulate price ranges, etc. Also the alert tone is pretty annoying.
 
 :)))))
+This is the hotfix
