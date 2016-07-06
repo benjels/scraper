@@ -30,8 +30,11 @@ class Scraper(object):
 		oldDate = 99999999999999999#this is for debug### JUST CHECKING AS WE GO BACK THROUGH THEM THAT THEY ARE BEING GIVEN TO US IN THE ORDER THAT THEY WERE POSTED TO THE SITE
 		#while True: increment pageNumber til we reach where we were up to
 		while(True):
+			print("going to page: " + self.rules["info"]["rootUrlStart"] + str(pageNumber) + self.rules["info"]["rootUrlEnd"])
 			response = requests.get(self.rules["info"]["rootUrlStart"] + str(pageNumber) + self.rules["info"]["rootUrlEnd"])
+			print("about to json loads this ting: " + str(response.status_code))
 			pageJSON = json.loads(response.text)
+			print("successfully made json with it family")
 			for eachListing in pageJSON["data"]:
 				#try:
 				#	print("checking listing with title:" + eachListing["title"])
@@ -43,7 +46,8 @@ class Scraper(object):
 				
 				assert(oldDate >= sanitisedDate)
 				oldDate = sanitisedDate# this is for debug###
-				if(self.sanitiseDate(self.rules["info"]["gotUpTo"]) > sanitisedDate):
+				#check whether we should keep going back through the listings. NOTE: the grailed API only serves up to page 99—approx a week's worth of listings
+				if(self.sanitiseDate(self.rules["info"]["gotUpTo"]) > sanitisedDate or pageNumber == 99):
 					self.logCurrentFoundItems()
 					return
 				if(self.decideIfRelevant(eachListing)):
